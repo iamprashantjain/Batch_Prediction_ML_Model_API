@@ -154,9 +154,12 @@ elif user_menu == 'FE (NCS)':
                     df1 = pd.DataFrame(predictions, columns = ['Predicted_Amount']).astype(int).squeeze()
                     df2 = data['SOLDAMOUNT'].rename("Actual_Amount")
                     
-                    df3 = (((df2.subtract(df1))/(df2.add(df1)))*100)
-                    df3 = round(df3,0)
+                    df3 = (((df1.subtract(df2))/(df2.add(df1)))*100).astype(int)
                     df3 = df3.rename("%%age diff")
+                    df4 = df3.to_frame()
+                    df4 = df4[df4['%%age diff'] == 0].size
+                    df5 = df3.to_frame().size
+
 
 
                     hide_table_row_index = """
@@ -168,15 +171,19 @@ elif user_menu == 'FE (NCS)':
 
                     st.subheader("Actual VS Predicted Results")
 
+                    avg_pct = df3.mean().astype(int)
+                    col1,col2,col3 = st.columns(3)
+                    col1.metric('Average % age diff of Predictions: ',avg_pct)
+                    col2.metric('No. of Exact Predictions',df4)
+                    col3.metric('Total Predictions',df5)
+
+
+                    
                     st.markdown(hide_table_row_index, unsafe_allow_html=True)
                     col1,col2,col3 = st.columns(3)
                     col1.table(df1)
                     col2.table(df2)
                     col3.table(df3)
-
-
-                    avg_pct = df3.mean().astype(int)
-                    st.metric('Average % age diff: ',avg_pct)
 
 
         except Exception as e:
